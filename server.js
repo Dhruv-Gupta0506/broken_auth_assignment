@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 const cookieParser = require("cookie-parser");
 const jwt = require("jsonwebtoken");
@@ -5,12 +6,15 @@ const requestLogger = require("./middleware/logger");
 const authMiddleware = require("./middleware/auth");
 const { generateToken } = require("./utils/tokenGenerator");
 
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Session storage (in-memory)
 const loginSessions = {};
 const otpStore = {};
+
+app.use(cookieParser());
 
 // Middleware
 app.use(requestLogger);
@@ -112,27 +116,27 @@ app.post("/auth/verify-otp", (req, res) => {
 
 app.post("/auth/token", (req, res) => {
   try {
-    const token = req.headers.authorization;
+    const sessionToken = req.cookies.session_token;
 
-    if (!token) {
+    if (!sessionToken) {
       return res
         .status(401)
         .json({ error: "Unauthorized - valid session required" });
     }
 
-    const session = loginSessions[token.replace("Bearer ", "")];
+    const session = loginSessions[sessionToken];
 
     if (!session) {
       return res.status(401).json({ error: "Invalid session" });
     }
 
     // Generate JWT
-    const secret = process.env.JWT_SECRET || "default-secret-key";
+    const secret = process.env.JWT_SECRET ;
 
     const accessToken = jwt.sign(
       {
         email: session.email,
-        sessionId: token,
+        sessionId: sessionToken,
       },
       secret,
       {
@@ -145,6 +149,7 @@ app.post("/auth/token", (req, res) => {
       expires_in: 900,
     });
   } catch (error) {
+    console.error("Token generation error:", error);
     return res.status(500).json({
       status: "error",
       message: "Token generation failed",
