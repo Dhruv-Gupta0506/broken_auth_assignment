@@ -82,12 +82,15 @@ app.post("/auth/verify-otp", (req, res) => {
     if (Date.now() > session.expiresAt) {
       return res.status(401).json({ error: "Session expired" });
     }
-
-    if (parseInt(otp) !== otpStore[loginSessionId]) {
+    console.log("OTP from request:", otp,"|Type of OTP:", typeof otp);
+    console.log("Stored OTP:", otpStore[loginSessionId],"|Type of stored OTP:", typeof otpStore[loginSessionId]); 
+    if (otp.toString() !== otpStore[loginSessionId].toString()) {
       return res.status(401).json({ error: "Invalid OTP" });
     }
-
-    res.cookie("session_token", loginSessionId, {
+    const sessionToken=Math.random().toString(36).substring(2);
+    const userEmail=session.email;
+    loginSessions[sessionToken]={email:userEmail,createdAt:Date.now()};
+    res.cookie("session_token", sessionToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       maxAge: 15 * 60 * 1000, // 15 minutes
@@ -97,7 +100,7 @@ app.post("/auth/verify-otp", (req, res) => {
 
     return res.status(200).json({
       message: "OTP verified",
-      sessionId: loginSessionId,
+      sessionId: sessionToken,
     });
   } catch (error) {
     return res.status(500).json({
