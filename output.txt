@@ -1,0 +1,14 @@
+C:\Users\DHRUV GUPTA>curl -X POST http://localhost:3000/auth/login -H "Content-Type: application/json" -d "{\"email\":\"dhruvgupta0506@gmail.com\",\"password\":\"password123\"}"
+{"message":"OTP sent","loginSessionId":"we5ket"}
+
+
+C:\Users\DHRUV GUPTA>curl -c cookies.txt -X POST http://localhost:3000/auth/verify-otp -H "Content-Type: application/json" -d "{\"loginSessionId\":\"we5ket\",\"otp\":\"566269\"}"
+{"message":"OTP verified","sessionId":"vvb5iwtrlna"}
+
+
+C:\Users\DHRUV GUPTA>curl -b cookies.txt -X POST http://localhost:3000/auth/token
+{"access_token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImRocnV2Z3VwdGEwNTA2QGdtYWlsLmNvbSIsInNlc3Npb25JZCI6InZ2YjVpd3RybG5hIiwiaWF0IjoxNzcwODQ1NjEzLCJleHAiOjE3NzA4NDY1MTN9.U9etXhO9fPSYc382_vvetfD4_D4xfM3bHTL5SEePLZ0","expires_in":900}
+
+
+C:\Users\DHRUV GUPTA>curl -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImRocnV2Z3VwdGEwNTA2QGdtYWlsLmNvbSIsInNlc3Npb25JZCI6InZ2YjVpd3RybG5hIiwiaWF0IjoxNzcwODQ1NjEzLCJleHAiOjE3NzA4NDY1MTN9.U9etXhO9fPSYc382_vvetfD4_D4xfM3bHTL5SEePLZ0" http://localhost:3000/protected
+{"message":"Access granted","user":{"email":"dhruvgupta0506@gmail.com","sessionId":"vvb5iwtrlna","iat":1770845613,"exp":1770846513},"success_flag":"FLAG-ZGhydXZndXB0YTA1MDZAZ21haWwuY29tX0NPTVBMRVRFRF9BU1NJR05NRU5U"}
